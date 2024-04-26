@@ -11,7 +11,7 @@ export const schema = createSchema({
     ),
 
     resolvers: {
-        Query
+        Query,
 
     },
 });
