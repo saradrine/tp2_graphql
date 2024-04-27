@@ -31,3 +31,27 @@ type Query {
   getCVById(id: ID!): CV
   getSkills: [Skill!]!
 }
+
+input AddCVInput {
+  name: String!
+  age: Int!
+  job: String!
+  userId: ID!
+  skillIds: [ID!]!
+}
+
+input UpdateCVInput {
+  id: ID!
+  name: String
+  age: Int
+  job: String
+  userId: ID
+  skillIds: [ID!]
+}
+
+type Mutation {
+  addCV(addCVInput: AddCVInput!): CV!
+  updateCV(updateCVInput : UpdateCVInput!): CV!
+  deleteCV(id: ID!): CV!
+}
+
