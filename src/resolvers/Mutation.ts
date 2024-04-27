@@ -1,7 +1,9 @@
-import {GraphQLError} from "graphql/error";
+import { randomUUID } from "crypto";
+import { GraphQLError } from "graphql/error";
+
 
 export const Mutation = {
-  addCV: (parent: any, { addCVInput }: any, { db,pubSub }: any, infos: any) => {
+  addCV: (parent: any, { addCVInput }: any, { db, pubSub }: any, infos: any) => {
     const { userId, skillIds, ...cvData } = addCVInput;
     const user = db.users.find((user: any) => user.id === parseInt(userId.toString()));
     if (!user) {
@@ -14,14 +16,17 @@ export const Mutation = {
       throw new GraphQLError(`Invalid skill(s) provided: ${skillIds}`);
     }
 
-    const newCV = { id: db.cvs.length + 1, user, skills, ...cvData };
+    const newCV = { id: randomUUID(), user, skills, ...cvData };
     db.cvs.push(newCV);
-    pubSub.publish("cvEvent", "A new CV has been added!" );
+    pubSub.publish("cvEvent", {
+      type: "ADD",
+      cv: newCV
+    });
     return newCV;
   },
 
-  updateCV: (parent: any, { updateCVInput }: any, { db,pubSub }: any, infos: any) => {
-    const { id,userId, skillIds, ...cvData } = updateCVInput;
+  updateCV: (parent: any, { updateCVInput }: any, { db, pubSub }: any, infos: any) => {
+    const { id, userId, skillIds, ...cvData } = updateCVInput;
     const cv = db.cvs.find((cv: any) => cv.id === parseInt(id.toString()));
     if (!cv) {
       throw new GraphQLError(`CV with id ${id} not found`);
@@ -40,17 +45,23 @@ export const Mutation = {
 
     cv.skills = skills;
     Object.assign(cv, cvData); // Update other fields
-    pubSub.publish("cvEvent", "A new CV has been updated!" );
+    pubSub.publish("cvEvent", {
+      type: "UPDATE",
+      cv: cv
+    });
     return cv;
   },
 
-  deleteCV: (parent: any, { id }: any, { db,pubSub }: any, infos: any) => {
+  deleteCV: (parent: any, { id }: any, { db, pubSub }: any, infos: any) => {
     const cvIndex = db.cvs.findIndex((cv: any) => cv.id === parseInt(id.toString()));
     if (cvIndex === -1) {
       throw new GraphQLError(`CV with id ${id} not found`);
     }
 
-    pubSub.publish("cvEvent",  "A new CV has been deleted!" );
+    pubSub.publish("cvEvent", {
+      type: "DELETE",
+      cv: db.cvs[cvIndex]
+    });
     return db.cvs.splice(cvIndex, 1)[0];
   }
 };

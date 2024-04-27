@@ -31,8 +31,13 @@ type Query {
   getCVById(id: ID!): CV
 }
 
+type cvEventObject{
+  type: String!
+  cv: CV!
+}
+
 type Subscription {
-  cvEvent: String!
+  cvEvent: cvEventObject!
 }
 
 input AddCVInput {
