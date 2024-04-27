@@ -1,7 +1,7 @@
 import {GraphQLError} from "graphql/error";
 
 export const Mutation = {
-  addCV: (parent: any, { addCVInput }: any, { db }: any, infos: any) => {
+  addCV: (parent: any, { addCVInput }: any, { db,pubSub }: any, infos: any) => {
     const { userId, skillIds, ...cvData } = addCVInput;
     const user = db.users.find((user: any) => user.id === parseInt(userId.toString()));
     if (!user) {
@@ -16,10 +16,11 @@ export const Mutation = {
 
     const newCV = { id: db.cvs.length + 1, user, skills, ...cvData };
     db.cvs.push(newCV);
+    pubSub.publish("cvEvent", "A new CV has been added!" );
     return newCV;
   },
 
-  updateCV: (parent: any, { updateCVInput }: any, { db }: any, infos: any) => {
+  updateCV: (parent: any, { updateCVInput }: any, { db,pubSub }: any, infos: any) => {
     const { id,userId, skillIds, ...cvData } = updateCVInput;
     const cv = db.cvs.find((cv: any) => cv.id === parseInt(id.toString()));
     if (!cv) {
@@ -38,16 +39,18 @@ export const Mutation = {
     }
 
     cv.skills = skills;
-    Object.assign(cv, cvData);
+    Object.assign(cv, cvData); // Update other fields
+    pubSub.publish("cvEvent", "A new CV has been updated!" );
     return cv;
   },
 
-  deleteCV: (parent: any, { id }: any, { db }: any, infos: any) => {
+  deleteCV: (parent: any, { id }: any, { db,pubSub }: any, infos: any) => {
     const cvIndex = db.cvs.findIndex((cv: any) => cv.id === parseInt(id.toString()));
     if (cvIndex === -1) {
       throw new GraphQLError(`CV with id ${id} not found`);
     }
 
+    pubSub.publish("cvEvent",  "A new CV has been deleted!" );
     return db.cvs.splice(cvIndex, 1)[0];
   }
 };
