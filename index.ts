@@ -1,28 +1,29 @@
-import { createSchema, createYoga } from "graphql-yoga";
+import { createPubSub, createSchema, createYoga } from "graphql-yoga";
 import { createServer } from "node:http";
 import { Query } from "./src/resolvers/Query";
+import { Subscription } from "./src/resolvers/Subscription";
 import { db } from "./src/database";
-import fs from "fs";
-import path from "path";
 import {Mutation} from "./src/resolvers/Mutation";
 
-export const schema = createSchema({
-    typeDefs: fs.readFileSync(
-        path.join(__dirname, "src/schema/schema.graphql"), "utf-8"
-    ),
+const fs = require("fs");
+const path = require("path");
 
-    resolvers: {
-        Query,
-        Mutation
-    },
-});
 function main() {
+    const pubSub = createPubSub();
     const yoga = createYoga({
-        schema,
+        schema: createSchema({
+            typeDefs: fs.readFileSync(
+                path.join(__dirname, "src/schema/schema.graphql"), "utf-8"
+            ),
+            resolvers: {
+                Query,
+                Subscription,
+                Mutation
+            },
+        }),
         context: {
-            db,
+            db, pubSub
         } as any,
-
     });
     const server = createServer(yoga);
     server.listen(4000, () => {

@@ -29,7 +29,10 @@ type Skill {
 type Query {
   getAllCVs: [CV!]!
   getCVById(id: ID!): CV
-  getSkills: [Skill!]!
+}
+
+type Subscription {
+  cvEvent: String!
 }
 
 input AddCVInput {
