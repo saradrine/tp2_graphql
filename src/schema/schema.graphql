@@ -3,7 +3,7 @@ type User {
   name: String!
   email: String!
   role: Role!
-  cvs: [CV!]!
+  # cvs: [CV!]!
 }
 
 enum Role {
@@ -23,7 +23,7 @@ type CV {
 type Skill {
   id: ID!
   designation: String!
-  cvs: [CV!]!
+  # cvs: [CV!]!
 }
 
 type Query {
