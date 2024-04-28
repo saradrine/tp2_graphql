@@ -4,6 +4,7 @@ import { Query } from "./src/resolvers/Query";
 import { Subscription } from "./src/resolvers/Subscription";
 import { db } from "./src/database";
 import {Mutation} from "./src/resolvers/Mutation";
+import { CV } from "./src/resolvers/Cv";
 
 const fs = require("fs");
 const path = require("path");
@@ -16,6 +17,7 @@ function main() {
                 path.join(__dirname, "src/schema/schema.graphql"), "utf-8"
             ),
             resolvers: {
+                CV,
                 Query,
                 Subscription,
                 Mutation

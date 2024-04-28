@@ -10,8 +10,13 @@ export interface CV {
     name: string;
     age: number;
     job: string;
-    user: User; // Référence à l'utilisateur
-    skills: Skill[]; // Référence aux compétences
+    userId: number; // Référence à l'utilisateur
+}
+
+export interface CV_Skill{
+    cvId: number;
+    skillId: number;
+
 }
 
 export interface Skill {
