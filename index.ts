@@ -2,12 +2,11 @@ import { createPubSub, createSchema, createYoga } from "graphql-yoga";
 import { createServer } from "node:http";
 import { Query } from "./src/resolvers/Query";
 import { Subscription } from "./src/resolvers/Subscription";
-import { db } from "./src/database";
-
+import { Mutation } from "./src/resolvers/Mutation";
 const fs = require("fs");
 const path = require("path");
 
-function main() {
+async function main() {
     const pubSub = createPubSub();
     const yoga = createYoga({
         schema: createSchema({
@@ -16,11 +15,12 @@ function main() {
             ),
             resolvers: {
                 Query,
+                Mutation,
                 Subscription
             },
         }),
         context: {
-            db, pubSub
+             pubSub
         } as any,
     });
     const server = createServer(yoga);
